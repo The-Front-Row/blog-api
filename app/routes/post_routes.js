@@ -58,8 +58,8 @@ router.get('/posts/:id', requireToken, (req, res, next) => {
 // CREATE
 // POST /posts
 router.post('/posts', requireToken, (req, res, next) => {
-  // set author of new post to be current user
-  req.body.post.author = req.user.id
+  // set owner of new post to be current user
+  req.body.post.owner = req.user.id
 
   Post.create(req.body.post)
     // respond to succesful `create` with status 201 and JSON of new "post"
@@ -75,15 +75,15 @@ router.post('/posts', requireToken, (req, res, next) => {
 // UPDATE
 // PATCH /posts/5a7db6c74d55bc51bdf39793
 router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
-  // if the client attempts to change the `author` property by including a new
-  // author, prevent that by deleting that key/value pair
-  delete req.body.post.author
+  // if the client attempts to change the `owner` property by including a new
+  // owner, prevent that by deleting that key/value pair
+  delete req.body.post.owner
 
   Post.findById(req.params.id)
     .then(handle404)
     .then(post => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
-      // it will throw an error if the current user isn't the author
+      // it will throw an error if the current user isn't the owner
       requireOwnership(req, post)
 
       // pass the result of Mongoose's `.update` to the next `.then`
