@@ -12,7 +12,7 @@ curl "${API}${URL_PATH}" \
     "post": {
       "content": "'"${CNT}"'",
       "title": "'"${TITLE}"'",
-      "author": "author",
+      "owner": "author",
       "comment": {}
     }
   }'
