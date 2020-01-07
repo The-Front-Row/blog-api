@@ -13,7 +13,7 @@ curl "${API}${URL_PATH}" \
       "content": "'"${CNT}"'",
       "title": "'"${TITLE}"'",
       "owner": "author",
-      "comment": {}
+      "comment": "This is a string pretending to be a comment"
     }
   }'
 
