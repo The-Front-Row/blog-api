@@ -1,7 +1,7 @@
 {
-  "name": "express-api-template",
+  "name": "blog-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "API for the blog application",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,7 +11,7 @@
     "s": "nodemon server.js",
     "debug-server": "DEBUG=express:* nodemon server.js"
   },
-  "author": "",
+  "author": "Mike & the Front Row Boiis ",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^3.0.7",
