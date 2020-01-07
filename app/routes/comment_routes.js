@@ -3,8 +3,8 @@ const express = require('express')
 // Passport docs: http://www.passportjs.org/docs/
 const passport = require('passport')
 
-// pull in Mongoose model for posts
-const Post = require('../models/post')
+// pull in Mongoose model for comments
+const Comment = require('../models/comment')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -17,7 +17,7 @@ const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
 
 // this is middleware that will remove blank fields from `req.body`, e.g.
-// { post: { title: '', text: 'foo' } } -> { post: { text: 'foo' } }
+// { comment: { title: '', text: 'foo' } } -> { comment: { text: 'foo' } }
 const removeBlanks = require('../../lib/remove_blank_fields')
 // passing this as a second argument to `router.<verb>` will make it
 // so that a token MUST be passed for that route to be available
@@ -28,43 +28,43 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 // INDEX
-// GET /posts
-router.get('/posts', (req, res, next) => {
-  Post.find()
-    .then(posts => {
-      // `posts` will be an array of Mongoose documents
+// GET /comments
+router.get('/comments', (req, res, next) => {
+  Comment.find()
+    .then(comments => {
+      // `comments` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
       // apply `.toObject` to each one
-      return posts.map(post => post.toObject())
+      return comments.map(comment => comment.toObject())
     })
-    // respond with status 200 and JSON of the posts
-    .then(posts => res.status(200).json({ posts: posts }))
+    // respond with status 200 and JSON of the comments
+    .then(comments => res.status(200).json({ comments: comments }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // SHOW
-// GET /posts/5a7db6c74d55bc51bdf39793
-router.get('/posts/:id', (req, res, next) => {
+// GET /comments/5a7db6c74d55bc51bdf39793
+router.get('/comments/:id', (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
-  Post.findById(req.params.id)
+  Comment.findById(req.params.id)
     .then(handle404)
-    // if `findById` is succesful, respond with 200 and "post" JSON
-    .then(post => res.status(200).json({ post: post.toObject() }))
+    // if `findById` is succesful, respond with 200 and "comment" JSON
+    .then(comment => res.status(200).json({ comment: comment.toObject() }))
     // if an error occurs, pass it to the handler
     .catch(next)
 })
 
 // CREATE
-// POST /posts
-router.post('/posts', requireToken, (req, res, next) => {
-  // set owner of new post to be current user
-  req.body.post.owner = req.user.id
+// POST /comments
+router.comment('/comments', requireToken, (req, res, next) => {
+  // set owner of new comment to be current user
+  req.body.comment.owner = req.user.id
 
-  Post.create(req.body.post)
-    // respond to succesful `create` with status 201 and JSON of new "post"
-    .then(post => {
-      res.status(201).json({ post: post.toObject() })
+  Comment.create(req.body.comment)
+    // respond to succesful `create` with status 201 and JSON of new "comment"
+    .then(comment => {
+      res.status(201).json({ comment: comment.toObject() })
     })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
@@ -73,21 +73,21 @@ router.post('/posts', requireToken, (req, res, next) => {
 })
 
 // UPDATE
-// PATCH /posts/5a7db6c74d55bc51bdf39793
-router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
+// PATCH /comments/5a7db6c74d55bc51bdf39793
+router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
-  delete req.body.post.owner
+  delete req.body.comment.owner
 
-  Post.findById(req.params.id)
+  Comment.findById(req.params.id)
     .then(handle404)
-    .then(post => {
+    .then(comment => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
       // it will throw an error if the current user isn't the owner
-      requireOwnership(req, post)
+      requireOwnership(req, comment)
 
       // pass the result of Mongoose's `.update` to the next `.then`
-      return post.updateOne(req.body.post)
+      return comment.updateOne(req.body.comment)
     })
     // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
@@ -96,15 +96,15 @@ router.patch('/posts/:id', requireToken, removeBlanks, (req, res, next) => {
 })
 
 // DESTROY
-// DELETE /posts/5a7db6c74d55bc51bdf39793
-router.delete('/posts/:id', requireToken, (req, res, next) => {
-  Post.findById(req.params.id)
+// DELETE /comments/5a7db6c74d55bc51bdf39793
+router.delete('/comments/:id', requireToken, (req, res, next) => {
+  Comment.findById(req.params.id)
     .then(handle404)
-    .then(post => {
-      // throw an error if current user doesn't own `post`
-      requireOwnership(req, post)
-      // delete the post ONLY IF the above didn't throw
-      post.deleteOne()
+    .then(comment => {
+      // throw an error if current user doesn't own `comment`
+      requireOwnership(req, comment)
+      // delete the comment ONLY IF the above didn't throw
+      comment.deleteOne()
     })
     // send back 204 and no content if the deletion succeeded
     .then(() => res.sendStatus(204))
