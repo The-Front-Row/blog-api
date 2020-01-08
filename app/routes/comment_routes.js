@@ -62,7 +62,7 @@ router.get('/comments/:id', (req, res, next) => {
 
 // CREATE
 // POST /comments
-router.comment('/comments', requireToken, (req, res, next) => {
+router.post('/comments', requireToken, (req, res, next) => {
   // set owner of new comment to be current user
   req.body.comment.owner = req.user.id
 
