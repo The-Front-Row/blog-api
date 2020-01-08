@@ -4,7 +4,7 @@ const express = require('express')
 const passport = require('passport')
 
 // pull in Mongoose model for comments
-const Comment = require('../models/comment')
+const Post = require('../models/post')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -64,13 +64,22 @@ router.get('/comments/:id', (req, res, next) => {
 // POST /comments
 router.post('/comments', requireToken, (req, res, next) => {
   // set owner of new comment to be current user
-  req.body.comment.owner = req.user.id
+  req.body.comment.author = req.user.id
 
-  Comment.create(req.body.comment)
-    // respond to succesful `create` with status 201 and JSON of new "comment"
-    .then(comment => {
-      res.status(201).json({ comment: comment.toObject() })
+  Post.findById(req.body.comment.post)
+    .then(post => {
+      post.comments.push(req.body.comment)
+      return post.save()
     })
+    .then(post => {
+      // console.log('save response is ', post)
+      res.status(201).json({ post: post.toObject() })
+    })
+  // Comment.create(req.body.comment)
+  //   // respond to succesful `create` with status 201 and JSON of new "comment"
+  //   .then(comment => {
+  //     res.status(201).json({ comment: comment.toObject() })
+  //   })
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
     // can send an error message back to the client
@@ -85,6 +94,7 @@ router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
   delete req.body.comment.owner
 
   Comment.findById(req.params.id)
+    // .populate('author')
     .then(handle404)
     .then(comment => {
       // pass the `req` object and the Mongoose record to `requireOwnership`
