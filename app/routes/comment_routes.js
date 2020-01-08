@@ -29,36 +29,36 @@ const router = express.Router()
 
 // INDEX
 // GET /comments
-router.get('/comments', (req, res, next) => {
-  Comment.find()
-  // populating user and post subdocs
-    .populate('user')
-    .populate('post')
-    .then(comments => {
-      // `comments` will be an array of Mongoose documents
-      // we want to convert each one to a POJO, so we use `.map` to
-      // apply `.toObject` to each one
-      return comments.map(comment => comment.toObject())
-    })
-    // respond with status 200 and JSON of the comments
-    .then(comments => res.status(200).json({ comments: comments }))
-    // if an error occurs, pass it to the handler
-    .catch(next)
-})
-
-// SHOW
-// GET /comments/5a7db6c74d55bc51bdf39793
-router.get('/comments/:id', (req, res, next) => {
-  // req.params.id will be set based on the `:id` in the route
-  Comment.findById(req.params.id)
-    .populate('user')
-    .populate('post')
-    .then(handle404)
-    // if `findById` is succesful, respond with 200 and "comment" JSON
-    .then(comment => res.status(200).json({ comment: comment.toObject() }))
-    // if an error occurs, pass it to the handler
-    .catch(next)
-})
+// router.get('/comments', (req, res, next) => {
+//   Comment.find()
+//   // populating user and post subdocs
+//     .populate('user')
+//     .populate('post')
+//     .then(comments => {
+//       // `comments` will be an array of Mongoose documents
+//       // we want to convert each one to a POJO, so we use `.map` to
+//       // apply `.toObject` to each one
+//       return comments.map(comment => comment.toObject())
+//     })
+//     // respond with status 200 and JSON of the comments
+//     .then(comments => res.status(200).json({ comments: comments }))
+//     // if an error occurs, pass it to the handler
+//     .catch(next)
+// })
+//
+// // SHOW
+// // GET /comments/5a7db6c74d55bc51bdf39793
+// router.get('/comments/:id', (req, res, next) => {
+//   // req.params.id will be set based on the `:id` in the route
+//   Comment.findById(req.params.id)
+//     .populate('user')
+//     .populate('post')
+//     .then(handle404)
+//     // if `findById` is succesful, respond with 200 and "comment" JSON
+//     .then(comment => res.status(200).json({ comment: comment.toObject() }))
+//     // if an error occurs, pass it to the handler
+//     .catch(next)
+// })
 
 // CREATE
 // POST /comments
@@ -93,6 +93,8 @@ router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
   // owner, prevent that by deleting that key/value pair
   delete req.body.comment.owner
 
+  Post.findById(req.body.comment.post)
+
   Comment.findById(req.params.id)
     // .populate('author')
     .then(handle404)
@@ -112,18 +114,28 @@ router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
 
 // DESTROY
 // DELETE /comments/5a7db6c74d55bc51bdf39793
-router.delete('/comments/:id', requireToken, (req, res, next) => {
-  Comment.findById(req.params.id)
-    .then(handle404)
-    .then(comment => {
-      // throw an error if current user doesn't own `comment`
-      requireOwnership(req, comment)
-      // delete the comment ONLY IF the above didn't throw
-      comment.deleteOne()
+
+router.delete('/comments/:id/:cmnt', requireToken, (req, res, next) => {
+  //('/posts/:postId/comments/:commrntId')
+  // const _id = req.user.id
+  // req.body.comment.author = req.user.id
+  console.log(req)
+  const postId = req.params.id
+  const cmntId = req.params.cmnt
+  Post.findById(postId)
+    .then(post => {
+      // requireOwnership(req, post)
+      post.comments.id(cmntId).remove()
+      return post.save()
     })
-    // send back 204 and no content if the deletion succeeded
-    .then(() => res.sendStatus(204))
-    // if an error occurs, pass it to the handler
+    .then(post => {
+      // console.log('save response is ', post)
+      res.status(204).json({ post: post.toObject() })
+    })
+
+    // if an error occurs, pass it off to our error handler
+    // the error handler needs the error message and the `res` object so that it
+    // can send an error message back to the client
     .catch(next)
 })
 
