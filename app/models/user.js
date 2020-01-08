@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const commentFile = require('./comment')
+const postFile = require('./post')
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -10,7 +12,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  token: String
+  token: String,
+  // comments: [commentFile.commentSchema],
+  // posts: [postFile.postSchema]
 }, {
   timestamps: true,
   toObject: {
