@@ -31,6 +31,9 @@ const router = express.Router()
 // GET /comments
 router.get('/comments', (req, res, next) => {
   Comment.find()
+  // populating user and post subdocs
+    .populate('user')
+    .populate('post')
     .then(comments => {
       // `comments` will be an array of Mongoose documents
       // we want to convert each one to a POJO, so we use `.map` to
@@ -48,6 +51,8 @@ router.get('/comments', (req, res, next) => {
 router.get('/comments/:id', (req, res, next) => {
   // req.params.id will be set based on the `:id` in the route
   Comment.findById(req.params.id)
+    .populate('user')
+    .populate('post')
     .then(handle404)
     // if `findById` is succesful, respond with 200 and "comment" JSON
     .then(comment => res.status(200).json({ comment: comment.toObject() }))
