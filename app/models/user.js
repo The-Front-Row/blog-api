@@ -6,11 +6,17 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  username: {
+    type: String,
+    required: true
+  },
   hashedPassword: {
     type: String,
     required: true
   },
   token: String
+  // comments: [commentFile.commentSchema],
+  // posts: [postFile.postSchema]
 }, {
   timestamps: true,
   toObject: {
