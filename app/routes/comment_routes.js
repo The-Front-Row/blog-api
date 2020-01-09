@@ -14,8 +14,8 @@ const customErrors = require('../../lib/custom_errors')
 const handle404 = customErrors.handle404
 // we'll use this function to send 401 when a user tries to modify a resource
 // that's owned by someone else
-const requireOwnership = customErrors.requireOwnership
-
+// const requireOwnership = customErrors.requireOwnership
+const requireOwnershipComment = customErrors.requireOwnershipComment
 // this is middleware that will remove blank fields from `req.body`, e.g.
 // { comment: { title: '', text: 'foo' } } -> { comment: { text: 'foo' } }
 const removeBlanks = require('../../lib/remove_blank_fields')
@@ -100,7 +100,7 @@ router.patch('/comments/:postId/:commentId', requireToken, removeBlanks, (req, r
   Post.findById(postId)
     .then(handle404)
     .then(post => {
-      requireOwnership(req, post)
+      requireOwnershipComment(req, post)
       post.comments.id(commentId).updateOne(req.body.comment)
       return post.save()
     })
@@ -125,7 +125,7 @@ router.delete('/comments/:postId/:commentId', requireToken, (req, res, next) => 
   Post.findById(postId)
     // add handle404
     .then(post => {
-      requireOwnership(req, post)
+      requireOwnershipComment(req, post)
       post.comments.id(commentId).remove()
       return post.save()
     })
