@@ -100,7 +100,7 @@ router.patch('/comments/:postId/:commentId', requireToken, removeBlanks, (req, r
   Post.findById(postId)
     .then(handle404)
     .then(post => {
-      // requireOwnership(req, post)
+      requireOwnership(req, post)
       console.log(req.body)
       post.comments.id(commentId)
         .updateOne(req.body.comment)
@@ -113,7 +113,6 @@ router.patch('/comments/:postId/:commentId', requireToken, removeBlanks, (req, r
 
 // DESTROY
 // DELETE /comments/5a7db6c74d55bc51bdf39793
-
 
 router.delete('/comments/:postId/:commentId', requireToken, (req, res, next) => {
   // ('/posts/:postId/comments/:commrntId')
