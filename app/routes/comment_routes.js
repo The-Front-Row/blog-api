@@ -103,7 +103,7 @@ router.patch('/comments/:postId/:commentId', requireToken, removeBlanks, (req, r
       // requireOwnership(req, post)
       console.log(req.body)
       post.comments.id(commentId)
-        .updateOne(req.body.post.comment)
+        .updateOne(req.body.comment)
       return post.save()
     })
     .then(() => res.sendStatus(204))
