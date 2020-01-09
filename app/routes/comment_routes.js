@@ -14,7 +14,9 @@ const customErrors = require('../../lib/custom_errors');
 const handle404 = customErrors.handle404;
 // we'll use this function to send 401 when a user tries to modify a resource
 // that's owned by someone else
-const requireOwnership = customErrors.requireOwnership;
+
+// const requireOwnership = customErrors.requireOwnership
+const requireOwnershipComment = customErrors.requireOwnershipComment
 
 // this is middleware that will remove blank fields from `req.body`, e.g.
 // { comment: { title: '', text: 'foo' } } -> { comment: { text: 'foo' } }
@@ -124,29 +126,29 @@ router.delete(
     // ('/posts/:postId/comments/:commrntId')
     // /comments/:id/:cmnt
 
-    // const _id = req.user.id
-    // req.body.comment.author = req.user.id
-    const postId = req.params.postId;
-    // .id
-    const commentId = req.params.commentId;
-    // .cmnt
-    Post.findById(postId)
-      // add handle404
-      .then(post => {
-        requireOwnership(req, post);
-        post.comments.id(commentId).remove();
-        return post.save();
-      })
-      .then(post => {
-        // console.log('save response is ', post)
-        res.status(204).json({ post: post.toObject() });
-      })
-      // comment
-      // if an error occurs, pass it off to our error handler
-      // the error handler needs the error message and the `res` object so that it
-      // can send an error message back to the client
-      .catch(next);
-  }
-);
+  // const _id = req.user.id
+  // req.body.comment.author = req.user.id
+  const postId = req.params.postId
+  // .id
+  const commentId = req.params.commentId
+  // .cmnt
+  Post.findById(postId)
+    // add handle404
+    .then(post => {
+      requireOwnershipComment(req, post)
+      post.comments.id(commentId).remove()
+      return post.save()
+    })
+    .then(post => {
+      // console.log('save response is ', post)
+      res.status(204).json({ post: post.toObject() })
+    })
+    // comment
+    // if an error occurs, pass it off to our error handler
+    // the error handler needs the error message and the `res` object so that it
+    // can send an error message back to the client
+    .catch(next)
+})
+
 
 module.exports = router;
