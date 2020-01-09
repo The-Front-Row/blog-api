@@ -10,6 +10,9 @@ const commentSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   }
+  // editable: {
+  //   type: Boolean
+  // }
 }, {
   timestamps: true
 })
