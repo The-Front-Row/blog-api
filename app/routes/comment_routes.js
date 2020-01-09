@@ -88,25 +88,24 @@ router.post('/comments', requireToken, (req, res, next) => {
 
 // UPDATE
 // PATCH /comments/5a7db6c74d55bc51bdf39793
-router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
+router.patch('/comments/:postId/:commentId', requireToken, removeBlanks, (req, res, next) => {
   // if the client attempts to change the `owner` property by including a new
   // owner, prevent that by deleting that key/value pair
   delete req.body.comment.owner
 
-  Post.findById(req.body.comment.post)
-
-  Comment.findById(req.params.id)
-    // .populate('author')
+  const postId = req.params.postId
+  // .id
+  const commentId = req.params.commentId
+  // .cmnt
+  Post.findById(postId)
     .then(handle404)
-    .then(comment => {
-      // pass the `req` object and the Mongoose record to `requireOwnership`
-      // it will throw an error if the current user isn't the owner
-      requireOwnership(req, comment)
-
-      // pass the result of Mongoose's `.update` to the next `.then`
-      return comment.updateOne(req.body.comment)
+    .then(post => {
+      // requireOwnership(req, post)
+      console.log(req.body)
+      post.comments.id(commentId)
+        .updateOne(req.body.comment)
+      return post.save()
     })
-    // if that succeeded, return 204 and no JSON
     .then(() => res.sendStatus(204))
     // if an error occurs, pass it to the handler
     .catch(next)
@@ -115,17 +114,22 @@ router.patch('/comments/:id', requireToken, removeBlanks, (req, res, next) => {
 // DESTROY
 // DELETE /comments/5a7db6c74d55bc51bdf39793
 
-router.delete('/comments/:id/:cmnt', requireToken, (req, res, next) => {
+
+router.delete('/comments/:postId/:commentId', requireToken, (req, res, next) => {
   // ('/posts/:postId/comments/:commrntId')
+  // /comments/:id/:cmnt
+
   // const _id = req.user.id
   // req.body.comment.author = req.user.id
-  console.log(req)
-  const postId = req.params.id
-  const cmntId = req.params.cmnt
+  const postId = req.params.postId
+  // .id
+  const commentId = req.params.commentId
+  // .cmnt
   Post.findById(postId)
+    // add handle404
     .then(post => {
       // requireOwnership(req, post)
-      post.comments.id(cmntId).remove()
+      post.comments.id(commentId).remove()
       return post.save()
     })
     .then(post => {

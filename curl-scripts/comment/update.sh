@@ -1,19 +1,16 @@
 #!/bin/bash
 
 API="http://localhost:4741"
-URL_PATH="/posts"
+URL_PATH="/comments"
 
-curl "${API}${URL_PATH}/${ID}" \
+curl "${API}${URL_PATH}/${ID}/${CMNT}" \
   --include \
   --request PATCH \
   --header "Content-Type: application/json" \
   --header "Authorization: Bearer ${TOKEN}" \
   --data '{
-    "post": {
+    "comment": {
       "content": "'"${CNT}"'",
-      "title": "'"${TITLE}"'",
-      "owner": "author",
-      "comment": "This is a string pretending to be a comment"
     }
   }'
 
