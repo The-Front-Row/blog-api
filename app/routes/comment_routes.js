@@ -15,7 +15,7 @@ const handle404 = customErrors.handle404
 // we'll use this function to send 401 when a user tries to modify a resource
 // that's owned by someone else
 
-const requireOwnership = customErrors.requireOwnership
+// const requireOwnership = customErrors.requireOwnership
 const requireCommentOwnership = customErrors.requireCommentOwnership
 
 // this is middleware that will remove blank fields from `req.body`, e.g.
@@ -106,7 +106,7 @@ router.patch(
     Post.findById(postId)
       .then(handle404)
       .then(post => {
-        requireOwnership(req, post)
+        requireCommentOwnership(req, post.comments.id(commentId))
         post.comments.id(commentId).set(req.body.comment)
         return post.save()
       })
@@ -135,7 +135,7 @@ router.delete(
     Post.findById(postId)
     // add handle404
       .then(post => {
-        requireCommentOwnership(req, post)
+        // requireCommentOwnership(req, post)
         post.comments.id(commentId).remove()
         return post.save()
       })
