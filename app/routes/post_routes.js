@@ -57,6 +57,13 @@ router.get('/posts/:id', (req, res, next) => {
     //   return res.status(200).json({ post: post.toObject() })
     // })
     .then(handle404)
+    // .then(post => {
+    //   if (post.author !== req.params.id) {
+    //     post.editable = false
+    //   } else {
+    //     post.editable = true
+    //   }
+    // })
     // if `findById` is succesful, respond with 200 and "post" JSON
     .then(post => res.status(200).json({ post: post.toObject() }))
     .catch(next)
