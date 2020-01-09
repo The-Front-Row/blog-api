@@ -114,9 +114,11 @@ router.patch('/comments/:postId/:commentId', requireToken, removeBlanks, (req, r
 // DESTROY
 // DELETE /comments/5a7db6c74d55bc51bdf39793
 
+
 router.delete('/comments/:postId/:commentId', requireToken, (req, res, next) => {
   // ('/posts/:postId/comments/:commrntId')
   // /comments/:id/:cmnt
+
   // const _id = req.user.id
   // req.body.comment.author = req.user.id
   const postId = req.params.postId
@@ -134,7 +136,7 @@ router.delete('/comments/:postId/:commentId', requireToken, (req, res, next) => 
       // console.log('save response is ', post)
       res.status(204).json({ post: post.toObject() })
     })
-
+    // comment
     // if an error occurs, pass it off to our error handler
     // the error handler needs the error message and the `res` object so that it
     // can send an error message back to the client
