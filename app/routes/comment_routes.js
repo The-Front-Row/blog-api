@@ -101,7 +101,6 @@ router.patch('/comments/:postId/:commentId', requireToken, removeBlanks, (req, r
     .then(handle404)
     .then(post => {
       requireOwnership(req, post)
-      console.log(req.body)
       post.comments.id(commentId)
         .updateOne(req.body.comment)
       return post.save()
@@ -127,7 +126,7 @@ router.delete('/comments/:postId/:commentId', requireToken, (req, res, next) => 
   Post.findById(postId)
     // add handle404
     .then(post => {
-      // requireOwnership(req, post)
+      requireOwnership(req, post)
       post.comments.id(commentId).remove()
       return post.save()
     })
