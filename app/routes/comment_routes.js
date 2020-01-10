@@ -135,7 +135,7 @@ router.delete(
     Post.findById(postId)
     // add handle404
       .then(post => {
-        requireCommentOwnership(req, post)
+        requireCommentOwnership(req, post.comments.id(commentId)
         post.comments.id(commentId).remove()
         return post.save()
       })
